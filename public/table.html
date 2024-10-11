@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>table</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/unlazy@0.11.3/dist/unlazy.with-hashing.iife.js"
+      defer
+      init
+    ></script>
+  </head>
+  <body>
+    <header>
+      <nav class="flex items-center p-4 bg-primary text-white">
+        <div class="flex gap-4">
+          <div class="flex-1 gap-4">
+            <a href="./index.html"
+              ><h3 class="text-2xl font-bold">Quản lí chi tiêu</h3></a
+            >
+          </div>
+          <a href="./table.html" class="text-lg font-medium"
+            >Xem chi tiết thông tin</a
+          >
+          <a href="./index.html" class="text-lg font-medium"
+            >Nhập liệu chi tiêu</a
+          >
+        </div>
+      </nav>
+    </header>
+    <div class="container mt-5">
+      <div class="filter-data mb-5">
+        <label for="month" class="block text-sm font-medium">Tháng:</label>
+        <select
+          id="month"
+          name="month"
+          class="w-full px-3 py-2 mt-1 text-sm text-black placeholder-zinc-400 border rounded-lg focus:outline-none focus:ring focus:ring-primary"
+        >
+          <option value="">Chọn tháng...</option>
+          <option value="1">Tháng 1</option>
+          <option value="2">Tháng 2</option>
+          <option value="3">Tháng 3</option>
+          <option value="4">Tháng 4</option>
+          <option value="5">Tháng 5</option>
+          <option value="6">Tháng 6</option>
+          <option value="7">Tháng 7</option>
+          <option value="8">Tháng 8</option>
+          <option value="9">Tháng 9</option>
+          <option value="10">Tháng 10</option>
+          <option value="11">Tháng 11</option>
+          <option value="12">Tháng 12</option>
+        </select>
+        <label for="year" class="block mt-4 text-sm font-medium">Năm:</label>
+        <select
+          id="year"
+          name="year"
+          class="w-full px-3 py-2 mt-1 text-sm text-black placeholder-zinc-400 border rounded-lg focus:outline-none focus:ring focus:ring-primary"
+        >
+          <option value="">Chọn năm...</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+        </select>
+        <label for="category" class="block mt-4 text-sm font-medium"
+          >Danh mục:</label
+        >
+        <select
+          id="category"
+          name="category"
+          class="w-full px-3 py-2 mt-1 text-sm text-black placeholder-zinc-400 border rounded-lg focus:outline-none focus:ring focus:ring-primary"
+        >
+          <option value="">Chọn danh mục...</option>
+          <option value="Ăn uống">Ăn uống</option>
+          <option value="Di chuyển">Di chuyển</option>
+          <option value="Đồ sinh hoạt">Đồ sinh hoạt</option>
+          <option value="Shopee">Shopee</option>
+          <option value="Chơi">Chơi</option>
+          <option value="Khác">Khác</option>
+          <option value="Học tập">Học tập</option>
+        </select>
+        <button class="btn btn-primary mt-4 w-full" id="searchBtn">Tìm kiếm</button>
+      </div>
+      <h3>Danh Sách Dữ Liệu</h3>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Ngày</th>
+            <th scope="col">Danh mục</th>
+            <th scope="col">Tên</th>
+            <th scope="col">Tiền</th>
+          </tr>
+        </thead>
+        <tbody class="table-data-list"></tbody>
+      </table>
+      <div class="loading-indicator"></div>
+    </div>
+  </body>
+  <script>
+
+    const tableDataList = document.querySelector(".table-data-list");
+    const month = document.querySelector("#month");
+    const year = document.querySelector("#year");
+    const category = document.querySelector("#category");
+    const searchBtn = document.querySelector("#searchBtn");
+    const api =
+      "https://script.googleusercontent.com/macros/echo?user_content_key=eyEGbQChjcsFRy8SgCm7GaOFQvdv3pcVVCSM3fGSCs0k6s7Jd79h4B8emiQDZTmSDdsE6gbTZJvBPAQm8YRFL7yP0815LcMlm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnLzF0hpkyVtMAacK2Dvirt_FpJwHBIsbnIAhOVp4VXHZC7DVjyF_WOviPeh7Q8fgN7JKKIN_OWa_l5jXUSFMH7jLqGIMN1djLtz9Jw9Md8uu";
+
+    const loadingRow = document.createElement("tr");
+    const loadingCell = document.createElement("td");
+    loadingCell.setAttribute("colspan", "4");
+    loadingCell.innerHTML = `
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+`
+
+    loadingRow.appendChild(loadingCell);
+    tableDataList.appendChild(loadingRow);
+
+    function renderTableData(data) {
+      tableDataList.innerHTML = ""; 
+      data.forEach((item) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${new Date(item.Date).toLocaleDateString()}</td>
+          <td>${item.Select}</td>
+          <td>${item.Name || "Không có tên"}</td>
+          <td>${item.spentMoney} VNĐ</td>
+        `;
+        tableDataList.appendChild(row);
+      });
+    
+      if (data.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.setAttribute("colspan", "4");
+        cell.textContent = "Không có dữ liệu phù hợp.";
+        row.appendChild(cell);
+        tableDataList.appendChild(row);
+      }
+    }
+    
+    fetch(api)
+      .then((response) => response.json())
+      .then((data) => {
+        allData = data.data;
+        renderTableData(allData); 
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        tableDataList.removeChild(loadingRow);
+      });
+    
+    searchBtn.addEventListener("click", () => {
+      const selectedMonth = month.value;
+      const selectedYear = year.value;
+      const selectedCategory = category.value;
+    
+      const filteredData = allData.filter((item) => {
+        const itemDate = new Date(item.Date);
+        const itemMonth = (itemDate.getMonth() + 1).toString();
+        const itemYear = itemDate.getFullYear().toString();
+    
+        const monthMatch = selectedMonth === "" || itemMonth === selectedMonth;
+        const yearMatch = selectedYear === "" || itemYear === selectedYear;
+        const categoryMatch =
+          selectedCategory === "" || item.Select === selectedCategory;
+    
+        return monthMatch && yearMatch && categoryMatch;
+      });
+    
+      renderTableData(filteredData); 
+    });
+
+  </script>
+</html>
